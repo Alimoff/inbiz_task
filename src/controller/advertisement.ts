@@ -4,8 +4,7 @@ import { AdvertisementModel } from '../database/models/advertisement/model';
 import { Category } from '../types/common';
 import dotenv from 'dotenv';
 import { autoDeleteExpiredAds } from '../middleware/autoDelete';
-import {AuthRequest} from "../config/auth"
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 
 dotenv.config()
 
@@ -48,9 +47,7 @@ export class AdvertisementController {
     //Method POST 
     // To create new advertisement
     public async create(req: Request, res: Response, next: NextFunction){
-
         try{
-
             const {title, description, category,price, image,duration} = req.body;
             const publishedDate = Date.now();
             const expirationDate = new Date();
@@ -60,6 +57,7 @@ export class AdvertisementController {
     
             //To get accessToken if user is authorized
             const authorizationHeader = req.headers.authorization;
+
     
             if (!authorizationHeader) {
                 // Handle case where no access token is present
@@ -67,12 +65,11 @@ export class AdvertisementController {
               }
     
             const token = authorizationHeader.split(' ')[1];
-    
+
               //Get user._id from accessToken
-            const decodedToken = jwt.verify(token, jwtSecret) as { id: string };
-    
-            const publishedBy = decodedToken.id;
-            console.log(publishedBy)
+            const decodedToken = jwt.verify(token, jwtSecret) as { _id: string };
+
+            const publishedBy = decodedToken._id;
 
 
             const newAdvertisement = new AdvertisementModel({

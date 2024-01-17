@@ -5,6 +5,7 @@ import { User } from '../database/models/auth';
 import { StatusCodes } from 'http-status-codes';
 import CreateHttpError from "http-errors"
 import { Role } from '../types/common';
+import { emailRegex } from '../constant/regex';
 
 
 export class AuthController {
@@ -13,12 +14,15 @@ export class AuthController {
   public async signup(req: Request, res: Response, next: NextFunction) {
     try{
       const {name, surname, email, password,role} = req.body
-    
+
+
+      emailRegex.test(email);
+       
       if ([Role.ADMIN, Role.SUPERADMIN].includes(role)){
         return res.status(StatusCodes.BAD_REQUEST).json({error: "Invalid role for signup"});
       }
 
-      let findUser:any = await User.findOne({email})
+      let findUser= await User.findOne({email});
 
       if(findUser) {
         throw CreateHttpError(
@@ -27,12 +31,11 @@ export class AuthController {
         );
       }
 
-
       const hashPassword = bcrypt.hashSync(password, 12);
       const newUser = new User({
         name,surname,email,password:hashPassword,role});
 
-        await newUser.save();
+       await newUser.save();
 
         const accessToken = createAccessToken({ id: newUser._id});
         const refreshToken = createRefreshToken({id:newUser._id});
@@ -45,10 +48,9 @@ export class AuthController {
 
       res.status(StatusCodes.OK).json({name, surname, email, role, accessToken});
     }catch (message){
-      return res.status(StatusCodes.BAD_REQUEST).json({msg: message})
+      return res.status(StatusCodes.BAD_REQUEST).json({message})
     }
   } 
-
 
   //METHOD POST
   //Sign in 
@@ -94,13 +96,8 @@ public async signout (req:Request, res: Response, next: NextFunction){
 
   let user: any = await User.findOne({email});
 
-
-  if (!user){
-    user = await User.findOne({email});
-  }
-
   if(!user){
-    res.status(StatusCodes.NOT_FOUND).json({msg:"User not found"});
+    res.status(StatusCodes.NOT_FOUND).json({message: "User not found"});
   }else{
     res.clearCookie('refreshtoken',{path: '/user/refresh_token'});  
   }
@@ -110,7 +107,7 @@ public async signout (req:Request, res: Response, next: NextFunction){
 
   return res.status(StatusCodes.OK).json({msg: "Logged out"});
 }catch(message){
-  return res.status(StatusCodes.BAD_REQUEST).json({msg: "Internal server error"});
+  return res.status(StatusCodes.BAD_REQUEST).json({message: "Internal server error"});
 }
 
 }
@@ -118,6 +115,7 @@ public async signout (req:Request, res: Response, next: NextFunction){
 public async createAdmin (req:Request, res:Response){
     try{
       const {name, surname, email, password,role} = req.body
+
     
       if (![Role.ADMIN, Role.SUPERADMIN].includes(role)){
         return res.status(StatusCodes.BAD_REQUEST).json({error: "Invalid role for signup admin or superadmin"});
@@ -153,7 +151,7 @@ public async createAdmin (req:Request, res:Response){
 
       res.status(StatusCodes.OK).json({name, surname, email,role, accessToken});
     }catch (message){
-      return res.status(StatusCodes.BAD_REQUEST).json({msg: message})
+      return res.status(StatusCodes.BAD_REQUEST).json({message})
     }
   }
 
@@ -164,7 +162,7 @@ public async createAdmin (req:Request, res:Response){
     res.status(StatusCodes.OK).json({allUsers});
 
     }catch(message){
-      res.status(StatusCodes.BAD_REQUEST).json({message:"Internal server error"})
+      res.status(StatusCodes.BAD_REQUEST).json({message: "Internal server error"})
     }
   }
 }
