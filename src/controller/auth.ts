@@ -18,7 +18,7 @@ export class AuthController {
         return res.status(StatusCodes.BAD_REQUEST).json({error: "Invalid role for signup"});
       }
 
-      let findUser:any = await User.findOne({email});
+      let findUser:any = await User.findOne({email})
 
       if(findUser) {
         throw CreateHttpError(
@@ -26,6 +26,7 @@ export class AuthController {
           `User with ${email} already signed up`
         );
       }
+
 
       const hashPassword = bcrypt.hashSync(password, 12);
       const newUser = new User({
@@ -42,11 +43,12 @@ export class AuthController {
           maxAge: 7*24*60*60*1000,
         })
 
-      res.status(StatusCodes.OK).json({name, surname, email,password, role, accessToken});
+      res.status(StatusCodes.OK).json({name, surname, email, role, accessToken});
     }catch (message){
       return res.status(StatusCodes.BAD_REQUEST).json({msg: message})
     }
   } 
+
 
   //METHOD POST
   //Sign in 
@@ -164,12 +166,11 @@ public async createAdmin (req:Request, res:Response){
     }catch(message){
       res.status(StatusCodes.BAD_REQUEST).json({message:"Internal server error"})
     }
-
   }
 }
 
 const createAccessToken = (user: any): string => {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '10m' })
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1h' })
 }
 const createRefreshToken = (user: any): string => {
   return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' })

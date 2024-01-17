@@ -13,6 +13,19 @@ export enum Role {
     SUPERADMIN = 'superadmin',
 }
 
+export enum Category {
+    ELECTRONICS = 'electronics',
+    CARS = 'cars',
+    CLOTHES = 'clothes',
+    FURNITURE_AND_DECOR = 'furniture_and_decor',
+    HEALTH = 'health',
+    COSMETICS = 'cosmetics',
+    FOOD_AND_BEVERAGE = 'food_and_beverage',
+    HOUSEHOLD_ITEMS = 'household_items',
+    OFFICE_EQUIPMENT = 'office_equipment',
+    OTHER = 'other',
+}
+
 export type Handler = (
     request:Request,
     response:Response,

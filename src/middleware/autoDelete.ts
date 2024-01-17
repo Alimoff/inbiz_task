@@ -16,3 +16,4 @@ schedule.scheduleJob('0 0 * * *', async () => {
   await autoDeleteExpiredAds();
   console.log('Auto-deletion of expired advertisements completed.');
 });
+ 

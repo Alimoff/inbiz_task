@@ -51,7 +51,7 @@ export const validateIdParam = (
 };
 
 // Middleware to check if the user is a superadmin
-export const requireSuperadmin = (req: Request, res: Response, next: NextFunction) => {
+export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization;
 
   if (!token) {
@@ -69,11 +69,75 @@ export const requireSuperadmin = (req: Request, res: Response, next: NextFunctio
       // Type assertion to inform TypeScript about the type of decodedToken
       const userRole = (decodedToken as { role: string }).role;
 
-      if (userRole !== 'SUPERADMIN') {
+      if (userRole !== 'ADMIN') {
           return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
       }
 
       // User is a superadmin, proceed to the next middleware or route handler
+      next();
+  } catch (error) {
+      console.error(error);
+      return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+  }
+};
+
+
+
+
+export const requireIndividual = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+      return res.status(401).json({ error: 'Unauthorized - Missing token' });
+  }
+
+  try {
+      const decodedToken: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+      if (!decodedToken || typeof decodedToken !== 'object' || !('role' in decodedToken)) {
+          // Additional check to handle potential issues with jwt.verify
+          return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+      }
+
+      // Type assertion to inform TypeScript about the type of decodedToken
+      const userRole = (decodedToken as { role: string }).role;
+
+      if (userRole !== 'INDIVIDUAL') {
+          return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
+      }
+
+      // User is an individual, proceed to the next middleware or route handler
+      next();
+  } catch (error) {
+      console.error(error);
+      return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+  }
+};
+
+
+export const requireLegal = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+      return res.status(401).json({ error: 'Unauthorized - Missing token' });
+  }
+
+  try {
+      const decodedToken: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+      if (!decodedToken || typeof decodedToken !== 'object' || !('role' in decodedToken)) {
+          // Additional check to handle potential issues with jwt.verify
+          return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+      }
+
+      // Type assertion to inform TypeScript about the type of decodedToken
+      const userRole = (decodedToken as { role: string }).role;
+
+      if (userRole !== 'LEGAL') {
+          return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
+      }
+
+      // User is a legal, proceed to the next middleware or route handler
       next();
   } catch (error) {
       console.error(error);
