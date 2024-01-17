@@ -22,9 +22,9 @@ const Auth = new Schema<IAuth>({
   },
   role: {
     type: String,
-    enum: [Role.LEGAL, Role.INDIVIDUAL, Role.ADMIN],
-    default:Role.INDIVIDUAL,
-  }
-})
+    enum: [Role.LEGAL, Role.INDIVIDUAL, Role.ADMIN, Role.SUPERADMIN],
+    required: true,
+  },
+});
 
 export const User = model<IAuth>('User', Auth)
