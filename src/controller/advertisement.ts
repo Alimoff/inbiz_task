@@ -52,8 +52,6 @@ export class AdvertisementController {
             const publishedDate = Date.now();
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + duration);
-            
-            const jwtSecret: any = process.env.ACCESS_TOKEN_SECRET;
     
             //To get accessToken if user is authorized
             const authorizationHeader = req.headers.authorization;
@@ -67,10 +65,8 @@ export class AdvertisementController {
             const token = authorizationHeader.split(' ')[1];
 
               //Get user._id from accessToken
-            const decodedToken = jwt.verify(token, jwtSecret) as { _id: string };
-
-            const publishedBy = decodedToken._id;
-
+            const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
+            const publishedBy = decodedToken.id;
 
             const newAdvertisement = new AdvertisementModel({
                 title, description, category, price, image,duration,publishedDate,expirationDate, archived:false,publishedBy
@@ -86,13 +82,12 @@ export class AdvertisementController {
     //Method PUT
     //To update an advertisement by ID
     public async update(req: Request, res: Response, next: NextFunction){
-        const {title, description, category,price, image,publishedBy} = req.body;
+        const {title, description, category,price, image} = req.body;
         const {id} = req.params;
 
         try{
             const updatedAdvertisement = await AdvertisementModel.findOneAndUpdate({_id:id},{
-                title, description, category, price, image, publishedBy: req.user
-            });
+                title, description, category, price, image});
 
             if (![Category.CARS, Category.CLOTHES, Category.COSMETICS, Category.ELECTRONICS, Category.FOOD_AND_BEVERAGE,
                 Category.FURNITURE_AND_DECOR, Category.HEALTH, Category.HOUSEHOLD_ITEMS, Category.OFFICE_EQUIPMENT, Category.OTHER].includes(category)){

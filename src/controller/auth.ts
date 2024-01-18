@@ -6,6 +6,9 @@ import { StatusCodes } from 'http-status-codes';
 import CreateHttpError from "http-errors"
 import { Role } from '../types/common';
 import { emailRegex } from '../constant/regex';
+import moment from 'moment';
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 export class AuthController {
@@ -15,11 +18,10 @@ export class AuthController {
     try{
       const {name, surname, email, password,role} = req.body
 
-
-      emailRegex.test(email);
+      // emailRegex.test(email);
        
       if ([Role.ADMIN, Role.SUPERADMIN].includes(role)){
-        return res.status(StatusCodes.BAD_REQUEST).json({error: "Invalid role for signup"});
+        res.status(StatusCodes.BAD_REQUEST).json({error: "Invalid role for signup"});
       }
 
       let findUser= await User.findOne({email});
@@ -46,7 +48,7 @@ export class AuthController {
           maxAge: 7*24*60*60*1000,
         })
 
-      res.status(StatusCodes.OK).json({name, surname, email, role, accessToken});
+      return res.status(StatusCodes.OK).json({name, surname, email, role, accessToken});
     }catch (message){
       return res.status(StatusCodes.BAD_REQUEST).json({message})
     }
@@ -57,7 +59,7 @@ export class AuthController {
   public async signin(req:Request, res: Response, next: NextFunction){
     try{
       const {email, password} = req.body;
-      console.log(req.body);
+
       let findUser: any = await User.findOne({email});
 
       if(!findUser){
@@ -83,10 +85,10 @@ export class AuthController {
     findUser.refreshtoken = refreshtoken;
     await findUser.save();
 
-    res.json({ accessToken, findUser });
+    return res.json({ accessToken, findUser });
     //@ts-ignore
     }catch(message){
-      res.status(StatusCodes.BAD_REQUEST).json({accessToken: null})
+      res.status(StatusCodes.BAD_REQUEST).json({message});
     }
   }
 
@@ -145,9 +147,9 @@ public async createAdmin (req:Request, res:Response){
 
         res.cookie('refreshtoken', refreshToken, {
           httpOnly: true,
-          path: 'user/refresh_token',
+          path: '/', // Set to the root path
           maxAge: 7*24*60*60*1000,
-        })
+        });
 
       res.status(StatusCodes.OK).json({name, surname, email,role, accessToken});
     }catch (message){
@@ -167,9 +169,12 @@ public async createAdmin (req:Request, res:Response){
   }
 }
 
+
 const createAccessToken = (user: any): string => {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1h' })
+
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: moment.duration(30, 'days').asSeconds() });
 }
+
 const createRefreshToken = (user: any): string => {
-  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' })
-} 
+  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: moment.duration(15, 'days').asSeconds() });
+}
