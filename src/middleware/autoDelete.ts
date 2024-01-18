@@ -10,7 +10,6 @@ export const autoDeleteExpiredAds = async () => {
     );
   };
 
-
 // Schedule the autoDeleteExpiredAds to run daily at a specific time (adjust as needed)
 schedule.scheduleJob('0 0 * * *', async () => {
   await autoDeleteExpiredAds();

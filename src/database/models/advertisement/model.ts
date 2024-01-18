@@ -5,7 +5,7 @@ import { Category, Role } from '../../../types/common';
 const AdvertisementSchema = new Schema<IAdvertisement>({
   title: {
     type: String,
-    required: true,
+    // required: true,
   },
   description: {
     type: String,
@@ -28,7 +28,7 @@ const AdvertisementSchema = new Schema<IAdvertisement>({
     type: Number,
     required: true,
   },
-  image: {
+  file: {
     type: String,
   },
   publishedBy: {

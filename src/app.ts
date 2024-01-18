@@ -11,6 +11,8 @@ import passport from 'passport';
 import http from 'http';
 import WebSocket from 'ws';
 import { setupWebSocket } from './socket/socket';
+import * as path from 'path';
+
 
 dotenv.config();
 
@@ -29,6 +31,9 @@ app.use(morgan('dev'));
 app.use(router);
 //regiteriation cokies
 app.use(cokierPreser());
+
+//Upload files to folder named `static`
+app.use('/static', express.static(path.join(__dirname, '../', '/static')));
 
 app.use(session({
     secret: 'Site visit',

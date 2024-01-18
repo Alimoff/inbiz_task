@@ -5,6 +5,8 @@ import { ValidationError, ObjectSchema } from "yup";
 import { changeResponse } from "./../utils/changeResponse";
 import { objectIdRegex } from "./../constant/regex";
 import *  as jwt from "../config/jwt";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const validate =
   // @ts-ignore
@@ -54,12 +56,12 @@ export const validateIdParam = (
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization;
 
-  if (!token) {
-      return res.status(401).json({ error: 'Unauthorized - Missing token' });
-  }
-
   try {
-      const decodedToken: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized - Missing token' });
+            }
+      const decodedToken: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
 
       if (!decodedToken || typeof decodedToken !== 'object' || !('role' in decodedToken)) {
           // Additional check to handle potential issues with jwt.verify
