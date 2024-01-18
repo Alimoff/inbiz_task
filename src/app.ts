@@ -8,12 +8,18 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import passport from 'passport';
+import http from 'http';
+import WebSocket from 'ws';
+import { setupWebSocket } from './socket/socket';
 
 dotenv.config();
 
 const secretKey:any = process.env.ACCESS_TOKEN_SECRET;
 
 export const app: Application = express();
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 //Middleware
 app.use(cors());
 app.use(express.json());
@@ -30,3 +36,5 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false, maxAge : 6000000 }
 }));
+
+setupWebSocket(server);
