@@ -1,12 +1,13 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, SchemaTypes } from 'mongoose';
 import { IAuth } from './types';
 import { Role } from '../../../types/common';
 
 const Auth = new Schema<IAuth>({
   email: {
     type: String,
-    unique: true,
     required: true,
+    unique: true,
+
   },
   name: {
     type: String,
@@ -25,6 +26,10 @@ const Auth = new Schema<IAuth>({
     enum: [Role.LEGAL, Role.INDIVIDUAL, Role.ADMIN, Role.SUPERADMIN],
     required: true,
   },
+  notifications: [{
+    type: SchemaTypes.ObjectId,
+    ref: "Notification"
+  }]
 });
 
 export const User = model<IAuth>('User', Auth)

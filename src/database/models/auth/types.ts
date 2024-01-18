@@ -8,5 +8,6 @@ export interface IAuth extends Document {
     name: string;
     surname: string;
     role: Role;
+    notifications: ObjectId[];
   }
 export type AuthDocument = Document & IAuth;

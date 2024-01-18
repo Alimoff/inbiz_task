@@ -7,3 +7,5 @@ export interface IMessage {
   to: ObjectId;
   content: string;
 }
+
+export type MessageDocument = Document & IMessage;

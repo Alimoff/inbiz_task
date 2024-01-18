@@ -1,5 +1,6 @@
 import { model, Schema, SchemaTypes } from "mongoose";
-import { IMessage} from "./types";
+import { IMessage, MessageDocument} from "./types";
+import { NotificationModel } from "../notifcation"
 
 const messageSchema = new Schema<IMessage>({
     from :{
@@ -19,4 +20,11 @@ const messageSchema = new Schema<IMessage>({
 
 });
 
+messageSchema.post<MessageDocument>('save', async function(doc){
+    await NotificationModel.create({
+        userId: doc.to,
+        message: `You have a message from ${doc.from}`,
+    });
+})
+ 
 export const MessageModel = model("Message", messageSchema); 
