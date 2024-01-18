@@ -12,10 +12,10 @@ export class CategoryController {
 
         const isExist = await CategoryModel.findOne({name});
 
-        if ([Category.CARS, Category.CLOTHES, Category.COSMETICS, Category.ELECTRONICS, Category.FOOD_AND_BEVERAGE,
-        Category.FURNITURE_AND_DECOR, Category.HEALTH, Category.HOUSEHOLD_ITEMS, Category.OFFICE_EQUIPMENT, Category.OTHER].includes(name)){
-            return res.status(StatusCodes.BAD_REQUEST).json({error: `Category ${name} already exists`});
-          }
+        // if ([Category.CARS, Category.CLOTHES, Category.COSMETICS, Category.ELECTRONICS, Category.FOOD_AND_BEVERAGE,
+        // Category.FURNITURE_AND_DECOR, Category.HEALTH, Category.HOUSEHOLD_ITEMS, Category.OFFICE_EQUIPMENT, Category.OTHER].includes(name)){
+        //     return res.status(StatusCodes.BAD_REQUEST).json({error: `Category ${name} already exists`});
+        //   }
 
         if (isExist){
             res.status(StatusCodes.BAD_REQUEST).json({message: "Category already exists"}); 
@@ -24,7 +24,7 @@ export class CategoryController {
         const newCategory = new CategoryModel({
            name, description});
 
-        newCategory.save();
+        await newCategory.save();
         }
         return res.status(StatusCodes.OK).json({message: "Category successfully created!"});
         }
