@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config()
 
 // Middleware to verify JWT and attach user information to req
 export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
   // Get the token from the request headers or cookies or wherever you store it
   const token = req.headers.authorization?.split(' ')[1]; // Assuming the token is sent in the Authorization header
+  console.log(token);
 
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized - Missing token' });
@@ -12,7 +15,7 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
 
   try {
     // Verify the token and decode its payload
-    const decodedToken = jwt.verify(token, 'your-secret-key') as { id: string };
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
 
     // Attach the user ID to the request object
     req.user = { id: decodedToken.id };
