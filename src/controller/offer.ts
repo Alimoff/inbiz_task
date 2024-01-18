@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import dotenv from 'dotenv';
 import { OfferModel } from '../database/models/offer/model';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -40,11 +41,23 @@ export class OfferController {
     //Method POST 
     // To create new offer
     public async create(req: Request, res: Response, next: NextFunction){
-        const {adId,userId,price,description} = req.body;
+        const {adId,price,description} = req.body;
         const date = Date.now();
     
         try{
-            const newOffer = new OfferModel({ adId,userId, price, description, date});
+            //To get accessToken if user is authorized
+            const authorizationHeader = req.headers.authorization;
+
+            if (!authorizationHeader) {
+                // Handle case where no access token is present
+                return res.status(401).json({ error: 'Unauthorized - Missing token' });}
+          
+            const token = authorizationHeader.split(' ')[1];
+            //Get user._id from accessToken
+            const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
+            const publishedBy = decodedToken.id;
+          
+            const newOffer = new OfferModel({ adId,userId:publishedBy, price, description, date});
             await newOffer.save();
 
             return res.status(StatusCodes.OK).json({message: newOffer});
@@ -56,12 +69,12 @@ export class OfferController {
     //Method PUT
     //To update an offer by ID
     public async update(req: Request, res: Response, next: NextFunction){
-        const {userId, price, description,date} = req.body;
+        const { price, description,date} = req.body;
         const {id} = req.params;
 
         try{
             const updatedOffer = await OfferModel.findOneAndUpdate({_id:id},{
-                userId, price, description, date
+             price, description, date
             });
 
             updatedOffer?.save();
