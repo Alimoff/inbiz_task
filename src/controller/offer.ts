@@ -3,6 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import dotenv from 'dotenv';
 import { OfferModel } from '../database/models/offer/model';
 import jwt from 'jsonwebtoken';
+import { AdvertisementModel } from '../database/models/advertisement/model';
+import { NotificationModel } from '../database/models/notification';
 
 dotenv.config();
 
@@ -60,6 +62,7 @@ export class OfferController {
             const newOffer = new OfferModel({ adId,userId:publishedBy, price, description, date});
             await newOffer.save();
 
+
             return res.status(StatusCodes.OK).json({message: newOffer});
         }catch(error){
             return res.status(StatusCodes.BAD_REQUEST).json({message: error});
@@ -77,7 +80,7 @@ export class OfferController {
              price, description, date
             });
 
-            updatedOffer?.save();
+            await updatedOffer?.save();
 
             return res.status(StatusCodes.OK).json({message: updatedOffer});
 

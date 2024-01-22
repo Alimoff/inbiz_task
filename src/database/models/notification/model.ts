@@ -7,6 +7,11 @@ const notificationSchema = new Schema<INotification>({
     ref: "User",
     required: true,
    },
+   advertiserId:{
+      type: SchemaTypes.ObjectId,
+      ref: "User",
+      required: true,
+   },
    message: {
     type: String,
     required: true,
@@ -14,6 +19,11 @@ const notificationSchema = new Schema<INotification>({
    isRead: {
     type: Boolean, 
     default: false,
+   },
+   advId: {
+      type:SchemaTypes.ObjectId,
+      ref: "Advertisement",
+      required:true,
    }
 });
 

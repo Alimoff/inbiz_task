@@ -37,34 +37,34 @@ app.use(session({
     cookie: { secure: false, maxAge : 6000000 }
 }));
 
-// io.on("connection", async (socket:any) => {
-//     console.log("A user connected", socket.id);
+io.on("connection", async (socket:any) => {
+    console.log("A user connected", socket.id);
   
-//     socket.on("chat message", async (message:any) => {
-//       console.log("message from client", JSON.parse(message));
-//       io.emit("chat message", JSON.stringify(message));
-//     });
-//            // Emit a welcome message to the user
-//            socket.emit('newMessage', {
-//             from: 'Server',
-//             text: 'Welcome to the e-commerce chat!',
-//             createdAt: new Date().getTime()
-//         });
+    socket.on("chat message", async (message:any) => {
+      console.log("message from client", JSON.parse(message));
+      io.emit("chat message", JSON.stringify(message));
+    });
+           // Emit a welcome message to the user
+           socket.emit('newMessage', {
+            from: 'Server',
+            text: 'Welcome to the e-commerce chat!',
+            createdAt: new Date().getTime()
+        });
 
-//         // Listen for messages from the user
-//         socket.on('createMessage', (newMessage) => {
-//             console.log('New message from user:', newMessage);
+        // Listen for messages from the user
+        socket.on('createMessage', (newMessage:any) => {
+            console.log('New message from user:', newMessage);
 
-//             // You can broadcast this message to sellers or other users
-//             io.emit('newMessage', {
-//                 from: newMessage.from,
-//                 text: newMessage.text,
-//                 createdAt: new Date().getTime()
-//             });
-//         });
+            // You can broadcast this message to sellers or other users
+            io.emit('newMessage', {
+                from: newMessage.from,
+                text: newMessage.text,
+                createdAt: new Date().getTime()
+            });
+        });
 
-//     // Handle disconnect event
-//     socket.on("disconnect", () => {
-//       console.log("A user disconnected");
-//     });
-//   });
+    // Handle disconnect event
+    socket.on("disconnect", () => {
+      console.log("A user disconnected");
+    });
+  });

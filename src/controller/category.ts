@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from 'http-status-codes';
-import { Category } from "../types/common";
 import { CategoryModel } from "../database/models/category";
 
 export class CategoryController {
     //METHOD POST
-    //Create product
+    //Create category
     public async create (req:Request, res: Response, next: NextFunction){
         try{
         const { name, description} = req.body;
@@ -21,7 +20,7 @@ export class CategoryController {
             res.status(StatusCodes.BAD_REQUEST).json({message: "Category already exists"}); 
         }else{
 
-        const newCategory = new CategoryModel({
+        const newCategory:any = new CategoryModel({
            name, description});
 
         await newCategory.save();
@@ -36,6 +35,7 @@ export class CategoryController {
 
 
     //METHOD PUT
+    //Update a category
     public async update (req: Request, res: Response, next: NextFunction) {
         try {
             const id = req.params;
@@ -45,7 +45,7 @@ export class CategoryController {
                 res.status(StatusCodes.NOT_FOUND).json({message: "Category is not found!"});
             }
 
-            const category = await CategoryModel.findOneAndUpdate({_id:id},
+            const category: any = await CategoryModel.findOneAndUpdate({_id:id},
                 {name,description}
                 )
  
@@ -59,11 +59,12 @@ export class CategoryController {
     }
 
        //METHOD DELETE
+       //Delete a category
        public async delete (req: Request, res: Response, next: NextFunction) {
         try {
             const id = req.params;
 
-            const category = await CategoryModel.findOneAndDelete({_id:id})
+            const category:any = await CategoryModel.findOneAndDelete({_id:id})
  
             category?.save();
 
@@ -74,6 +75,8 @@ export class CategoryController {
         }
     }
 
+    //Method GET
+    //Get all existing categories
     public async getAll (req:Request, res: Response, next: NextFunction) {
         try{
             const categories = await CategoryModel.find();
@@ -85,7 +88,8 @@ export class CategoryController {
         }
 
     }
-
+    //Method GET
+    //Get one category 
     public async get (req:Request, res: Response, next: NextFunction) {
         try{
             const id = req.body._id;
