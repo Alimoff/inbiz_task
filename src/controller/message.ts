@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import {MessageModel,MessageDocument} from "../database/models/message";
 import jwt from "jsonwebtoken";
 import { ChatModel } from "../database/models/chat/model";
+import { nextTick } from "process";
 
 export class MessageController {
     //Method GET
