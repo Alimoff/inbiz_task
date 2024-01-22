@@ -32,4 +32,4 @@ const Auth = new Schema<IAuth>({
   }]
 });
 
-export const User = model<IAuth>('User', Auth)
+export const User = model<IAuth>('User', Auth);

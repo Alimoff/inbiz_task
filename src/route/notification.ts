@@ -4,4 +4,4 @@ import { NotificationController } from "../controller/notification"
 export const notificationRouter = Router();
 const controller = new NotificationController();
 
-notificationRouter.get("/notification/:userId", controller.getNotifications);
+notificationRouter.get("/notification", controller.getNotifications);

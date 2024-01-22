@@ -4,8 +4,7 @@ import { AdvertisementModel } from '../database/models/advertisement/model';
 import { Category } from '../types/common';
 import dotenv from 'dotenv';
 import { autoDeleteExpiredAds } from '../middleware/autoDelete';
-import jwt, { decode } from 'jsonwebtoken';
-import { authenticateUser } from '../middleware/authenticate';
+import jwt from 'jsonwebtoken';
 
 dotenv.config()
 

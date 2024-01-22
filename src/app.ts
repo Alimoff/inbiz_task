@@ -3,25 +3,20 @@ import cors from 'cors';
 import cokierPreser from 'cookie-parser';
 import morgan from 'morgan';
 import { router } from './route';
-import { User } from './database/models/auth';
 import session from 'express-session';
-import dotenv from 'dotenv';
-import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import passport from 'passport';
 import http from 'http';
-import WebSocket from 'ws';
-import { setupWebSocket } from './socket/socket';
 import * as path from 'path';
-
-
+const socketIO = require('socket.io');
+// import {initSocketIO} from './socket/socketIO';
+import dotenv from 'dotenv';
 dotenv.config();
 
-const secretKey:any = process.env.ACCESS_TOKEN_SECRET;
-
 export const app: Application = express();
-
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+// initSocketIO(server);
+export const io = socketIO(server);
+
 //Middleware
 app.use(cors());
 app.use(express.json());
@@ -42,4 +37,34 @@ app.use(session({
     cookie: { secure: false, maxAge : 6000000 }
 }));
 
-setupWebSocket(server);
+// io.on("connection", async (socket:any) => {
+//     console.log("A user connected", socket.id);
+  
+//     socket.on("chat message", async (message:any) => {
+//       console.log("message from client", JSON.parse(message));
+//       io.emit("chat message", JSON.stringify(message));
+//     });
+//            // Emit a welcome message to the user
+//            socket.emit('newMessage', {
+//             from: 'Server',
+//             text: 'Welcome to the e-commerce chat!',
+//             createdAt: new Date().getTime()
+//         });
+
+//         // Listen for messages from the user
+//         socket.on('createMessage', (newMessage) => {
+//             console.log('New message from user:', newMessage);
+
+//             // You can broadcast this message to sellers or other users
+//             io.emit('newMessage', {
+//                 from: newMessage.from,
+//                 text: newMessage.text,
+//                 createdAt: new Date().getTime()
+//             });
+//         });
+
+//     // Handle disconnect event
+//     socket.on("disconnect", () => {
+//       console.log("A user disconnected");
+//     });
+//   });
