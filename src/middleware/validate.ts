@@ -4,8 +4,9 @@ import { getStatusText, StatusCodes } from "http-status-codes";
 import { ValidationError, ObjectSchema } from "yup";
 import { changeResponse } from "./../utils/changeResponse";
 import { objectIdRegex } from "./../constant/regex";
-import *  as jwt from "../config/jwt";
+import jwt from 'jsonwebtoken'
 import dotenv from "dotenv";
+import { Role } from "../types/common";
 dotenv.config();
 
 export const validate =
@@ -52,8 +53,9 @@ export const validateIdParam = (
   next();
 };
 
+export class RequireUserTypes{
 // Middleware to check if the user is a superadmin
-export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+public async  requireAdmin (req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization;
 
   try {
@@ -71,7 +73,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
       // Type assertion to inform TypeScript about the type of decodedToken
       const userRole = (decodedToken as { role: string }).role;
 
-      if (userRole !== 'ADMIN') {
+      if (userRole !== Role.ADMIN || Role.SUPERADMIN) {
           return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
       }
 
@@ -86,7 +88,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
 
 
 
-export const requireIndividual = (req: Request, res: Response, next: NextFunction) => {
+public async requireIndividual(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization;
 
   if (!token) {
@@ -94,7 +96,7 @@ export const requireIndividual = (req: Request, res: Response, next: NextFunctio
   }
 
   try {
-      const decodedToken: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const decodedToken: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
 
       if (!decodedToken || typeof decodedToken !== 'object' || !('role' in decodedToken)) {
           // Additional check to handle potential issues with jwt.verify
@@ -104,7 +106,7 @@ export const requireIndividual = (req: Request, res: Response, next: NextFunctio
       // Type assertion to inform TypeScript about the type of decodedToken
       const userRole = (decodedToken as { role: string }).role;
 
-      if (userRole !== 'INDIVIDUAL') {
+      if (userRole !== Role.INDIVIDUAL) {
           return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
       }
 
@@ -117,17 +119,17 @@ export const requireIndividual = (req: Request, res: Response, next: NextFunctio
 };
 
 
-export const requireLegal = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization;
+public async requireLegal (req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.authorization?.split(' ')[1]; 
 
   if (!token) {
       return res.status(401).json({ error: 'Unauthorized - Missing token' });
   }
 
   try {
-      const decodedToken: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      var decodedToken:any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
 
-      if (!decodedToken || typeof decodedToken !== 'object' || !('role' in decodedToken)) {
+      if (!decodedToken ) {
           // Additional check to handle potential issues with jwt.verify
           return res.status(401).json({ error: 'Unauthorized - Invalid token' });
       }
@@ -135,7 +137,7 @@ export const requireLegal = (req: Request, res: Response, next: NextFunction) =>
       // Type assertion to inform TypeScript about the type of decodedToken
       const userRole = (decodedToken as { role: string }).role;
 
-      if (userRole !== 'LEGAL') {
+      if (userRole !== Role.LEGAL) {
           return res.status(403).json({ error: 'Forbidden - Insufficient privileges' });
       }
 
@@ -146,3 +148,4 @@ export const requireLegal = (req: Request, res: Response, next: NextFunction) =>
       return res.status(401).json({ error: 'Unauthorized - Invalid token' });
   }
 };
+}
