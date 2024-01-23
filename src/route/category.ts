@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { CategoryController } from "../controller/category";
-import { requireAdmin } from "../middleware/validate";
+import { RequireUserTypes, validateIdParam } from "../middleware/validate";
 
 export const categoryRouter = Router();
 const controller = new CategoryController();
@@ -8,7 +8,7 @@ const controller = new CategoryController();
 
 categoryRouter.post("/category", controller.create);
 categoryRouter.get("/category", controller.getAll);
-categoryRouter.get("/category/:id", controller.get);
-categoryRouter.put("/category",requireAdmin, controller.update);
-categoryRouter.delete("/category",requireAdmin, controller.delete);
+categoryRouter.get("/category/:id", validateIdParam,controller.get);
+categoryRouter.put("/category", controller.update);
+categoryRouter.delete("/category", controller.delete);
 
