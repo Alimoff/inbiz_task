@@ -4,6 +4,7 @@ import {MessageModel,MessageDocument} from "../database/models/message";
 import jwt from "jsonwebtoken";
 import { ChatModel } from "../database/models/chat/model";
 import { nextTick } from "process";
+import { checkAuthorized } from "../config/check_auth";
 
 export class MessageController {
     //Method GET
@@ -12,17 +13,9 @@ export class MessageController {
         try {
           const { chatId, message } = req.body;
       
-            //To get accessToken if user is authorized
-            const authorizationHeader = req.headers.authorization;
-      
-            if (!authorizationHeader) {
-                // Handle case where no access token is present
-                return res.status(401).json({ error: 'Unauthorized - Missing token' });}
-      
-            const token = authorizationHeader.split(' ')[1];
-              //Get user._id from accessToken
-            const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
-            const publishedBy = decodedToken.id;
+            //Function to define user with their jwt access token ID
+            const publishedBy = await checkAuthorized(req, res);
+            
           // Assuming from and to are valid user IDs
           const newMessage = await MessageModel.create({chatId, message, sender:publishedBy})
           
@@ -54,17 +47,8 @@ public async getMessages(req: Request, res: Response) {
     try {
       const { chatId } = req.params;
 
-          //To get accessToken if user is authorized
-          const authorizationHeader = req.headers.authorization;
-
-          if (!authorizationHeader) {
-          // Handle case where no access token is present
-            return res.status(401).json({ error: 'Unauthorized - Missing token' });}
-      
-          const token = authorizationHeader.split(' ')[1];
-          //Get user._id from accessToken
-          const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
-          const publishedBy = decodedToken.id;
+      //Function to define user with their jwt access token ID
+      const publishedBy = await checkAuthorized(req, res)
   
       // Assuming from and to are valid user IDs
       const messages = await MessageModel.find({

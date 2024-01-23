@@ -5,6 +5,7 @@ import { OfferModel } from '../database/models/offer/model';
 import jwt from 'jsonwebtoken';
 import { AdvertisementModel } from '../database/models/advertisement/model';
 import { NotificationModel } from '../database/models/notification';
+import { checkAuthorized } from '../config/check_auth';
 
 dotenv.config();
 
@@ -46,17 +47,8 @@ export class OfferController {
         const {adId,price,description} = req.body;
     
         try{
-            //To get accessToken if user is authorized
-            const authorizationHeader = req.headers.authorization;
-
-            if (!authorizationHeader) {
-                // Handle case where no access token is present
-                return res.status(401).json({ error: 'Unauthorized - Missing token' });}
-          
-            const token = authorizationHeader.split(' ')[1];
-            //Get user._id from accessToken
-            const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
-            const publishedBy = decodedToken.id;
+            //Function to define user with their jwt access token ID
+            const publishedBy = await checkAuthorized(req, res)
 
           
             const newOffer = new OfferModel({ adId,userId:publishedBy, price, description});
@@ -83,9 +75,12 @@ export class OfferController {
         const { price, description,date} = req.body;
         const {id} = req.params;
 
+        //Function to define user with their jwt access token ID
+        const publishedBy = await checkAuthorized(req, res)
+
         try{
             const updatedOffer = await OfferModel.findOneAndUpdate({_id:id},{
-             price, description, date
+             price, description, date,userId:publishedBy
             });
 
             await updatedOffer?.save();

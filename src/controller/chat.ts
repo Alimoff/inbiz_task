@@ -3,6 +3,7 @@ import { ChatModel } from '../database/models/chat/model';
 import { User } from '../database/models/auth';
 import jwt from "jsonwebtoken";
 import { StatusCodes } from 'http-status-codes';
+import { checkAuthorized } from '../config/check_auth';
 
 export class ChatController {
 
@@ -11,17 +12,8 @@ export class ChatController {
     public async accessChats (req: Request, res: Response, next: NextFunction){
         const {userId} = req.body;
 
-        //To get accessToken if user is authorized
-        const authorizationHeader = req.headers.authorization;
-
-        if (!authorizationHeader) {
-        // Handle case where no access token is present
-            return res.status(401).json({ error: 'Unauthorized - Missing token' });}
-       
-        const token = authorizationHeader.split(' ')[1];
-        //Get user._id from accessToken
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
-        const publishedBy = decodedToken.id;
+        //Function to define user with their jwt access token ID
+        const publishedBy = await checkAuthorized(req, res)
 
         if(!userId) res.send("Provide user's ID");
         let chatExists:any = await ChatModel.find({
@@ -66,18 +58,8 @@ export class ChatController {
     //To get all existing chats
     public async fetch(req: Request, res:Response, next: NextFunction){
         try{ 
-        //To get accessToken if user is authorized
-          const authorizationHeader = req.headers.authorization;
-
-          if (!authorizationHeader) {
-          // Handle case where no access token is present
-              return res.status(401).json({ error: 'Unauthorized - Missing token' });}
-         
-          const token = authorizationHeader.split(' ')[1];
-          //Get user._id from accessToken
-          const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
-          const publishedBy = decodedToken.id;
-
+            //Function to define user with their jwt access token ID
+            const publishedBy = await checkAuthorized(req, res)
 
             const chats:any = await ChatModel.find({
                 users: {$elemMatch: { $eq: publishedBy}},
