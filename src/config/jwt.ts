@@ -14,6 +14,6 @@ const JWTConfig = {
 
 export default JWTConfig;
 
-export function verify(token: string, ACCESS_TOKEN_SECRET: string | undefined) {
-  throw new Error("Function not implemented.");
-}
+// export function verify(token: string, ACCESS_TOKEN_SECRET: string | undefined) {
+//   throw new Error("Function not implemented.");
+// }
