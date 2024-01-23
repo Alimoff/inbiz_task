@@ -44,7 +44,6 @@ export class OfferController {
     // To create new offer
     public async create(req: Request, res: Response, next: NextFunction){
         const {adId,price,description} = req.body;
-        const date = Date.now();
     
         try{
             //To get accessToken if user is authorized
@@ -58,12 +57,21 @@ export class OfferController {
             //Get user._id from accessToken
             const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as { id: string };
             const publishedBy = decodedToken.id;
+
           
-            const newOffer = new OfferModel({ adId,userId:publishedBy, price, description, date});
+            const newOffer = new OfferModel({ adId,userId:publishedBy, price, description});
             await newOffer.save();
 
+            const adv = await AdvertisementModel.findById(adId);
+            if(adv){
+                const advertiser = adv.publishedBy;
 
-            return res.status(StatusCodes.OK).json({message: newOffer});
+                 await NotificationModel.create({
+                    userId:publishedBy, advertiserId:advertiser,message:description,advId:adId
+                });
+            }
+
+            return res.status(StatusCodes.OK).json({newOffer});
         }catch(error){
             return res.status(StatusCodes.BAD_REQUEST).json({message: error});
         }
