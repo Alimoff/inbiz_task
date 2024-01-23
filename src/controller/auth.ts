@@ -42,8 +42,6 @@ export class AuthController {
         const accessToken = createAccessToken({ id: newUser._id, role: newUser.role});
         const refreshToken = createRefreshToken({id:newUser._id, role: newUser.role});
 
-        // const accessTokenRole = createAccessToken({role: newUser.role})
-        // const refreshTokenRole = createRefreshToken({role: newUser.role})
 
         res.cookie('refreshtoken', refreshToken, {
           httpOnly: true,
@@ -145,8 +143,8 @@ public async createAdmin (req:Request, res:Response){
 
         await newUser.save();
 
-        const accessToken = createAccessToken({ id: newUser._id});
-        const refreshToken = createRefreshToken({id:newUser._id});
+        const accessToken = createAccessToken({ id: newUser._id, role:newUser.role});
+        const refreshToken = createRefreshToken({id:newUser._id, role:newUser.role});
 
 
         res.cookie('refreshtoken', refreshToken, {

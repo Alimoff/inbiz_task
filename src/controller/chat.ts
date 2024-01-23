@@ -1,7 +1,6 @@
 import {Request, Response, NextFunction} from 'express';
 import { ChatModel } from '../database/models/chat/model';
 import { User } from '../database/models/auth';
-import jwt from "jsonwebtoken";
 import { StatusCodes } from 'http-status-codes';
 import { checkAuthorized } from '../config/check_auth';
 
