@@ -7,7 +7,6 @@ export const createAdValidationSchema = yup.object({
     price:yup.number(),
     file:yup.string(),
     duration: yup.number(),
-
 });
 
 export const updateAdValidationSchema = yup.object({

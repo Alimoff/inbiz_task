@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
-import {app} from './app' 
-import dotenv from 'dotenv'
+import mongoose from 'mongoose';
+import {app} from './app'; 
+import dotenv from 'dotenv';
 dotenv.config();
 
 const PORT = process.env.PORT || 4040;
@@ -16,6 +16,6 @@ const PASSWORD = process.env.MONGOOSE_PASSWORD;
       console.log(`Server running on port ${PORT}  💻`);
     });
   } catch ({ message }) {
-    console.log(`error => ${message} ❌`)
+    console.log(`error => ${message} ❌`);
   }
 })();
